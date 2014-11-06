@@ -17,6 +17,28 @@ namespace Metrics
             InitializeComponent();
         }
 
+        private void EvaluateJilbBtn_Click(object sender, EventArgs e)
+        {
+            MetricEvaluationContext context = 
+                new MetricEvaluationContext(new JilbEvaluationStrategy());
+            JilbMetric jilbMetric = context.EvaluateMetric(null) as JilbMetric;
+
+        }
+
+        private void LoadSourceBtn_Click(object sender, EventArgs e)
+        {
+            EnableMetricEvaluation();
+        }
+
+        private void EnableMetricEvaluation()
+        {
+            EvaluateJilbBtn.Enabled = true;
+            EvaluateMyersBtn.Enabled = true;
+        }
+
+        
      
     }
+
+
 }

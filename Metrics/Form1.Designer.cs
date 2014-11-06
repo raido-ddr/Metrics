@@ -207,6 +207,7 @@
             this.LoadSourceBtn.TabIndex = 4;
             this.LoadSourceBtn.Text = "Load";
             this.LoadSourceBtn.UseVisualStyleBackColor = true;
+            this.LoadSourceBtn.Click += new System.EventHandler(this.LoadSourceBtn_Click);
             // 
             // groupBox3
             // 
@@ -228,6 +229,7 @@
             this.EvaluateJilbBtn.TabIndex = 6;
             this.EvaluateJilbBtn.Text = "Evaluate";
             this.EvaluateJilbBtn.UseVisualStyleBackColor = true;
+            this.EvaluateJilbBtn.Click += new System.EventHandler(this.EvaluateJilbBtn_Click);
             // 
             // EvaluateMyersBtn
             // 
