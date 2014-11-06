@@ -7,7 +7,12 @@ namespace Metrics
 {
     abstract class Metric
     {
-        public double Value { get; set; }
+        public abstract double Value { get; }
         public int ConditionalStatementCount { get; set; }
+
+        public Metric(int conditionalStatementCount)
+        {
+            ConditionalStatementCount = conditionalStatementCount;
+        }
     }
 }

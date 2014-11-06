@@ -10,7 +10,28 @@ namespace Metrics
     {
         public override Metric EvaluateMetric(AnalyzableSource sourceCode)
         {
-            return new JilbMetric();
+            int totalStatementCount = CountAllStatements(sourceCode);
+            int conditionalStatementCount = CountConditionalStatements(sourceCode);
+            int conditionNestingLevel = DetermineConditionNestingLevel(sourceCode);
+
+            return new JilbMetric(totalStatementCount, conditionalStatementCount,
+                conditionNestingLevel);
+
+        }
+
+        private int CountConditionalStatements(AnalyzableSource sourceCode)
+        {
+            throw new NotImplementedException();
+        }
+
+        private int CountAllStatements(AnalyzableSource sourceCode)
+        {
+            throw new NotImplementedException();
+        }
+
+        private int DetermineConditionNestingLevel(AnalyzableSource sourceCode)
+        {
+            throw new NotImplementedException();
         }
     }
 }
