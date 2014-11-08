@@ -15,12 +15,14 @@ namespace Metrics
 
         public int TotalStatementCount { get; set; }
 
+        public int ConditionalStatementCount { get; set; }
+
         public int ConditionNestingLevel { get; set; }
 
         public JilbMetric(int totalStatementCount, 
             int conditionalStatementCount, int conditionNestingLevel)
-            : base(conditionalStatementCount)
         {
+            ConditionalStatementCount = conditionalStatementCount;
             TotalStatementCount = totalStatementCount;
             ConditionNestingLevel = conditionNestingLevel;
         }

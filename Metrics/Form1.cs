@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace Metrics
 {
     public partial class Form1 : Form
     {
+        private AnalyzableSource sourceCode;
+
         public Form1()
         {
             InitializeComponent();
@@ -28,12 +31,28 @@ namespace Metrics
         private void LoadSourceBtn_Click(object sender, EventArgs e)
         {
             EnableMetricEvaluation();
+
+            if (SourceFileDlg.ShowDialog() == DialogResult.OK)
+            {
+                SourceFileTxt.Text = SourceFileDlg.FileName;
+                sourceCode = new AnalyzableSource(SourceFileDlg.FileName);
+                SourceCodeViewTxt.Text = sourceCode.StringRepresentation;
+            }
         }
 
         private void EnableMetricEvaluation()
         {
             EvaluateJilbBtn.Enabled = true;
             EvaluateMyersBtn.Enabled = true;
+        }
+
+        private void EvaluateMyersBtn_Click(object sender, EventArgs e)
+        {
+            MetricEvaluationContext context =
+                new MetricEvaluationContext(new MyersEvaluationStrategy());
+            MyersMetric myersMetric = context.EvaluateMetric(sourceCode) as MyersMetric;
+
+            MyersMetricTxt.Text = myersMetric.CyclomaticComplexity.ToString("F1");
         }
 
         
