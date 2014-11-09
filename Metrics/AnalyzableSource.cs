@@ -9,36 +9,31 @@ namespace Metrics
 {
     class AnalyzableSource
     {
-        public string StringRepresentation { get; set; }
+        public string NormalizedRepresentation { get; set; }
 
-        private readonly string SplittingRegex  = 
-            "[ \\t]+(?=\\bbegin\\b|\\bend\\b|;|{|else|do|:(?!=))" +
-            "|(?<=\\bbegin\\b|\\bend\\b|;|}|\\belse\\b|\\bthen\\b|\\bof\\b|:(?<!=))[ \\t]";
+        public string RawRepresentation { get; set; }
+
+        public string[] LinewiseRepresentation { get; set; }
+
 
         public AnalyzableSource(string fileName)
         {
-            StringRepresentation = ReadSourceFromFile(fileName).ToLower();
+            SourceCodePreprocessor preprocessor =
+                SourceCodePreprocessor.Instance;
+
+            RawRepresentation = ReadSourceFromFile(fileName).ToLower();
+            NormalizedRepresentation = 
+                preprocessor.NormalizeSourceString(RawRepresentation);
+            LinewiseRepresentation =
+                preprocessor.SplitNormalizedSource(NormalizedRepresentation);
+
+            File.WriteAllLines("lines.txt", LinewiseRepresentation);
+
         }
 
         private string ReadSourceFromFile(string fileName)
         {
             return File.ReadAllText(fileName);
-        }
-
-        internal string[] SplitInLines()
-        {
-            string splittableCode = Regex.Replace(StringRepresentation, 
-                SplittingRegex, Environment.NewLine);
-
-            string[] splittedLines = splittableCode.Split(new string[]{Environment.NewLine},
-                StringSplitOptions.None);
-
-            foreach (var line in splittedLines)
-            {
-                line.Trim();
-            }
-
-            return splittedLines;
         }
 
         
