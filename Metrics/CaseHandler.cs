@@ -11,7 +11,7 @@ namespace Metrics
     {
         private string regex = "\\bcase\\b.*?\\bof\\b";
         private string beginsBlockRegex = "\\bcase\\b.*?\\bof\\b|begin";
-        private string endsBlockRegex = "\\bend;?\\b";
+        private string endsBlockRegex = "\\bend\\b;?";
         private string optionIndicatorRegex = ".*?:(?!=)";
 
         public override int EvaluateCyclomaticComplexity(string[] codeLines, int position)

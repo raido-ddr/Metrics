@@ -32,8 +32,8 @@
             this.EvaluateJilbBtn = new System.Windows.Forms.Button();
             this.JilbMetricTxt = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.ConditionalCountTxt = new System.Windows.Forms.Label();
+            this.ConditionalStatementCountTxt = new System.Windows.Forms.TextBox();
+            this.ConditionalCountLbl = new System.Windows.Forms.Label();
             this.StatementCountTxt = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -61,8 +61,8 @@
             this.groupBox1.Controls.Add(this.EvaluateJilbBtn);
             this.groupBox1.Controls.Add(this.JilbMetricTxt);
             this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.textBox1);
-            this.groupBox1.Controls.Add(this.ConditionalCountTxt);
+            this.groupBox1.Controls.Add(this.ConditionalStatementCountTxt);
+            this.groupBox1.Controls.Add(this.ConditionalCountLbl);
             this.groupBox1.Controls.Add(this.StatementCountTxt);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
@@ -100,22 +100,22 @@
             this.label2.TabIndex = 4;
             this.label2.Text = "Metric evaluation:";
             // 
-            // textBox1
+            // ConditionalStatementCountTxt
             // 
-            this.textBox1.Location = new System.Drawing.Point(165, 58);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(56, 20);
-            this.textBox1.TabIndex = 3;
+            this.ConditionalStatementCountTxt.Location = new System.Drawing.Point(165, 58);
+            this.ConditionalStatementCountTxt.Name = "ConditionalStatementCountTxt";
+            this.ConditionalStatementCountTxt.ReadOnly = true;
+            this.ConditionalStatementCountTxt.Size = new System.Drawing.Size(56, 20);
+            this.ConditionalStatementCountTxt.TabIndex = 3;
             // 
-            // ConditionalCountTxt
+            // ConditionalCountLbl
             // 
-            this.ConditionalCountTxt.AutoSize = true;
-            this.ConditionalCountTxt.Location = new System.Drawing.Point(10, 66);
-            this.ConditionalCountTxt.Name = "ConditionalCountTxt";
-            this.ConditionalCountTxt.Size = new System.Drawing.Size(141, 13);
-            this.ConditionalCountTxt.TabIndex = 2;
-            this.ConditionalCountTxt.Text = "Conditional statement count:";
+            this.ConditionalCountLbl.AutoSize = true;
+            this.ConditionalCountLbl.Location = new System.Drawing.Point(8, 61);
+            this.ConditionalCountLbl.Name = "ConditionalCountLbl";
+            this.ConditionalCountLbl.Size = new System.Drawing.Size(141, 13);
+            this.ConditionalCountLbl.TabIndex = 2;
+            this.ConditionalCountLbl.Text = "Conditional statement count:";
             // 
             // StatementCountTxt
             // 
@@ -161,10 +161,10 @@
             // 
             // MyersMetricTxt
             // 
-            this.MyersMetricTxt.Location = new System.Drawing.Point(164, 56);
+            this.MyersMetricTxt.Location = new System.Drawing.Point(128, 56);
             this.MyersMetricTxt.Name = "MyersMetricTxt";
             this.MyersMetricTxt.ReadOnly = true;
-            this.MyersMetricTxt.Size = new System.Drawing.Size(56, 20);
+            this.MyersMetricTxt.Size = new System.Drawing.Size(92, 20);
             this.MyersMetricTxt.TabIndex = 3;
             // 
             // CyclomaticComplexityTxt
@@ -187,7 +187,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 33);
+            this.label3.Location = new System.Drawing.Point(12, 28);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(113, 13);
             this.label3.TabIndex = 0;
@@ -241,7 +241,8 @@
             // 
             // SourceCodeViewTxt
             // 
-            this.SourceCodeViewTxt.Location = new System.Drawing.Point(275, 12);
+            this.SourceCodeViewTxt.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.SourceCodeViewTxt.Location = new System.Drawing.Point(275, 13);
             this.SourceCodeViewTxt.Multiline = true;
             this.SourceCodeViewTxt.Name = "SourceCodeViewTxt";
             this.SourceCodeViewTxt.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -275,8 +276,8 @@
         #endregion
 
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label ConditionalCountTxt;
+        private System.Windows.Forms.TextBox ConditionalStatementCountTxt;
+        private System.Windows.Forms.Label ConditionalCountLbl;
         private System.Windows.Forms.TextBox StatementCountTxt;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button EvaluateJilbBtn;

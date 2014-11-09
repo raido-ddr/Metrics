@@ -24,9 +24,19 @@ namespace Metrics
 
         private CyclomaticComplexityHandler FirstHandler { get; set; }
 
-        public int EvaluateCyclomaticComplexity(string[] codeLines, int position)
+        public int EvaluateCyclomaticComplexity(AnalyzableSource sourceCode)
         {
-            return FirstHandler.EvaluateCyclomaticComplexity(codeLines, position);
+            string[] codeLines = sourceCode.LinewiseRepresentation;
+            int cyclomaticComplexity = 0;
+
+            for (int i = 0; i < codeLines.Length; i++)
+            {
+                cyclomaticComplexity +=
+                    FirstHandler
+                .EvaluateCyclomaticComplexity(codeLines, i);
+            }
+
+            return cyclomaticComplexity;
         }
 
         private CyclomaticComplexityEvaluator()
@@ -39,7 +49,7 @@ namespace Metrics
             FirstHandler = new ConditionalHandler();
             CyclomaticComplexityHandler loopHandler = new LoopHandler();
             CyclomaticComplexityHandler caseHandler = new CaseHandler();
-            CyclomaticComplexityHandler generalHandler = new GeneralStatementHandler();
+            CyclomaticComplexityHandler generalHandler = new DefaultStatementHandler();
 
             FirstHandler.SetSuccessor(loopHandler);
             loopHandler.SetSuccessor(caseHandler);

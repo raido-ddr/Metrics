@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Metrics
 {
-    class GeneralStatementHandler : CyclomaticComplexityHandler
+    class DefaultStatementHandler : CyclomaticComplexityHandler
     {
 
         public override int EvaluateCyclomaticComplexity(string[] codeLines,

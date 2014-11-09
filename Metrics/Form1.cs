@@ -24,7 +24,10 @@ namespace Metrics
         {
             MetricEvaluationContext context = 
                 new MetricEvaluationContext(new JilbEvaluationStrategy());
-            JilbMetric jilbMetric = context.EvaluateMetric(null) as JilbMetric;
+            JilbMetric jilbMetric = context.EvaluateMetric(sourceCode) as JilbMetric;
+            StatementCountTxt.Text = jilbMetric.TotalStatementCount.ToString();
+            ConditionalStatementCountTxt.Text = jilbMetric.ConditionalStatementCount.ToString();
+            JilbMetricTxt.Text = jilbMetric.Value.ToString("F3");
 
         }
 
@@ -36,7 +39,7 @@ namespace Metrics
             {
                 SourceFileTxt.Text = SourceFileDlg.FileName;
                 sourceCode = new AnalyzableSource(SourceFileDlg.FileName);
-                SourceCodeViewTxt.Text = sourceCode.StringRepresentation;
+                SourceCodeViewTxt.Text = sourceCode.RawRepresentation;
             }
         }
 
