@@ -10,7 +10,7 @@ namespace Metrics
     {
         public override double Value
         {
-            get { return ConditionalStatementCount/TotalStatementCount; }
+            get { return  (double) ConditionalStatementCount / (double)TotalStatementCount; }
         }
 
         public int TotalStatementCount { get; set; }
