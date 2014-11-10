@@ -27,6 +27,7 @@ namespace Metrics
             LinewiseRepresentation =
                 preprocessor.SplitNormalizedSource(NormalizedRepresentation);
 
+            //For debug purposes only
             File.WriteAllLines("lines.txt", LinewiseRepresentation);
 
         }

@@ -22,6 +22,11 @@ namespace Metrics
 
         private string ConditionalStatementRegex = "\\bif\\b|\\belse\\b";
 
+        private string PredicateOperatorRegex = "\\bif\\b";
+
+        private static string PredicateRegex =
+          "(\\s*(<>|(?<!:)=|<|>)\\s*)(?=[^\\s0-9])|(?<=[^\\s0-9])(\\s*(<>|(?<!:)=|<|>)\\s*)";
+
         private string WordRegex = "\\b\\w+\\b|;";
 
         private AnalyzableSource SourceCode { get; set; }
@@ -33,20 +38,39 @@ namespace Metrics
 
         public int CountAllStatements()
         {
-            string sourceString = SourceCode.NormalizedRepresentation;
-
-            MatchCollection matches =
-                    Regex.Matches(sourceString, OperatorRegex, RegexOptions.IgnoreCase);
-              
-            return matches.Count;
+            return CountRegexMatches(OperatorRegex);
         }
 
         public int CountConditionalStatements()
         {
-            string sourceString = SourceCode.NormalizedRepresentation;
+            return CountRegexMatches(ConditionalStatementRegex);
+        }
+        
 
-            MatchCollection matches = Regex.Matches(sourceString,
-                ConditionalStatementRegex, RegexOptions.IgnoreCase);
+        public int EvaluateCyclomaticComplexity()
+        {
+            CyclomaticComplexityEvaluator evaluator = 
+                CyclomaticComplexityEvaluator.Instance;
+
+            return evaluator.EvaluateCyclomaticComplexity(SourceCode);
+        }
+
+        public int CountPredicates()
+        {
+            return CountRegexMatches(PredicateRegex);
+        }
+
+        public int CountOperatorsWithPredicates()
+        {
+            return CountRegexMatches(PredicateOperatorRegex);
+        }
+
+        private int CountRegexMatches(string regex)
+        {
+
+            MatchCollection matches =
+                    Regex.Matches(SourceCode.NormalizedRepresentation, regex,
+                    RegexOptions.IgnoreCase);
 
             return matches.Count;
         }
@@ -80,14 +104,5 @@ namespace Metrics
             return levelIndicator;
 
         }
-
-        public int EvaluateCyclomaticComplexity()
-        {
-            CyclomaticComplexityEvaluator evaluator = 
-                CyclomaticComplexityEvaluator.Instance;
-
-            return evaluator.EvaluateCyclomaticComplexity(SourceCode);
-        }
-
     }
 }
