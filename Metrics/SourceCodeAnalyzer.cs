@@ -23,7 +23,9 @@ namespace Metrics
 
         private string ElseRegex = "\\belse\\b";
 
-        private string ConditionalStatementRegex = "\\bif\\b";
+        private string CaseRegex = "\\bcase\\b.*?\\bof\\b";
+
+        private string ConditionalStatementRegex = "\\bif\\b|\\bcase\\b";
 
         private string PredicateOperatorRegex = "\\bif\\b";
 
@@ -96,13 +98,15 @@ namespace Metrics
 
         private int ProcessConditionalNestingLevel(int position, int baseLevel, bool isImplicit)
         {
-            int nestingLevel = baseLevel;
+            int conditionalDepth = baseLevel;
+            int nestingLevel = 0;
             string[] linewiseCode = SourceCode.LinewiseRepresentation;
             int i = position;
 
-            while ((i < linewiseCode.Length) && (nestingLevel >= baseLevel))
+            while ((i < linewiseCode.Length) && (conditionalDepth >= baseLevel))
             {
-                Console.WriteLine("{0}: {1}", nestingLevel, i + 1);
+                Console.WriteLine("{0}: {1}", conditionalDepth, i + 1);
+                UpdateConditionalNestingDepth(conditionalDepth);
 
                 if (Regex.IsMatch(linewiseCode[i], ConditionalRegex, RegexOptions.IgnoreCase))
                 {
@@ -110,33 +114,54 @@ namespace Metrics
                     bool notLastLine = i < (linewiseCode.Length - 2);
 
                     if (notLastLine && (!Regex.IsMatch(linewiseCode[i + 1], BlockStartRegex,
+                        RegexOptions.IgnoreCase)) && (!Regex.IsMatch(linewiseCode[i], CaseRegex,
                         RegexOptions.IgnoreCase)))
                     {
                         Console.WriteLine("to implicit");
                         i = ProcessConditionalNestingLevel(i + 1, baseLevel + 1, true);
-                        //nestingLevel++;
                     }
                     else
                     {
-                        i = ProcessConditionalNestingLevel(i + 1, baseLevel + 1, false);
+                        i = ProcessConditionalNestingLevel(i + 2, baseLevel + 1, false);
                     }
 
                     if (isImplicit)
                     {
-                        Console.WriteLine("{0}: end implicit", nestingLevel);
-                        nestingLevel--;
-                        //i++;
+                        Console.WriteLine("{0}: end implicit", conditionalDepth);
+                        conditionalDepth--;
                     }
 
                 }
-                else if (Regex.IsMatch(linewiseCode[i], BlockEndRegex,
+                else if (Regex.IsMatch(linewiseCode[i], BlockStartRegex,
                     RegexOptions.IgnoreCase))
                 {
-                    if (!Regex.IsMatch(linewiseCode[i + 1], ElseRegex,
+                    if (!Regex.IsMatch(linewiseCode[i - 1], ElseRegex,
                         RegexOptions.IgnoreCase))
                     {
+                        Console.WriteLine("begin");
+                        nestingLevel++;
+                        
+                    }
+                    i++;
+                    
+                }
+                else if (Regex.IsMatch(linewiseCode[i], BlockEndRegex,
+                RegexOptions.IgnoreCase))
+                {
+                    bool notLastLine = i < (linewiseCode.Length - 2);
+                    if (notLastLine &&  (!Regex.IsMatch(linewiseCode[i + 1], ElseRegex,
+                        RegexOptions.IgnoreCase)))
+                    {
                         Console.WriteLine("end");
-                        nestingLevel--;
+                        if (nestingLevel == 0)
+                        {
+                            conditionalDepth--;
+                            
+                        }
+                        else
+                        {
+                            nestingLevel--;
+                        }
                         i++;
                     }
                     else
@@ -152,8 +177,8 @@ namespace Metrics
                         if (notLastLine && (! Regex.IsMatch(linewiseCode[i + 1], ElseRegex,
                             RegexOptions.IgnoreCase)))
                         {
-                            Console.WriteLine("{0} end implicit", nestingLevel);
-                            nestingLevel--;
+                            Console.WriteLine("{0} end implicit", conditionalDepth);
+                            conditionalDepth--;
                             i++;
                         }
                         else
@@ -168,10 +193,11 @@ namespace Metrics
                     }
                 }
 
-                UpdateConditionalNestingDepth(nestingLevel);
+                
             }
 
-            Console.WriteLine("{0} end cond, ret {1}", nestingLevel, i);
+            
+            Console.WriteLine("{0} end cond, ret {1}", conditionalDepth, i);
 
             return i;
         }
