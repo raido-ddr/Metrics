@@ -108,14 +108,17 @@ namespace Metrics
                 Console.WriteLine("{0}: {1}", conditionalDepth, i + 1);
                 UpdateConditionalNestingDepth(conditionalDepth);
 
+                
                 if (Regex.IsMatch(LinewiseCode[i], ConditionalRegex, RegexOptions.IgnoreCase))
                 {
+                    //Conditional statement encountered
                     i = ProcessConditionalStatement(i, baseLevel, isImplicit, ref conditionalDepth);
 
                 }
                 else if (Regex.IsMatch(LinewiseCode[i], BlockStartRegex,
                     RegexOptions.IgnoreCase))
                 {
+                    //'Begin' keyword encountered
                     ProcessBlockStart(i, ref nestingLevel);
                     i++;
                     
@@ -123,10 +126,12 @@ namespace Metrics
                 else if (Regex.IsMatch(LinewiseCode[i], BlockEndRegex,
                 RegexOptions.IgnoreCase))
                 {
+                    //'End' keyword encountered
                     i = ProcessBlockEnd(i, ref nestingLevel, ref conditionalDepth);
                 }
                 else
                 {
+                    //Non-conditional statement encountered
                     i = ProcessDefaultStatement(i, ref conditionalDepth, isImplicit);
                 }
                 
@@ -144,20 +149,24 @@ namespace Metrics
 
             Console.WriteLine("cond: {0}", LinewiseCode[i]);
 
+            
             if (notLastLine && (!Regex.IsMatch(LinewiseCode[i + 1], BlockStartRegex,
                 RegexOptions.IgnoreCase)) && (!Regex.IsMatch(LinewiseCode[i], CaseRegex,
                 RegexOptions.IgnoreCase)))
             {
+                //'If' statement with implicit block encountered 
                 Console.WriteLine("to implicit");
                 i = ProcessConditionalNestingLevel(i + 1, baseLevel + 1, true);
             }
             else
             {
+                //'If' statement with explicit block encountered 
                 i = ProcessConditionalNestingLevel(i + 2, baseLevel + 1, false);
             }
 
             if (isImplicit)
             {
+                //Implicit block ends
                 Console.WriteLine("{0}: end implicit", conditionalDepth);
                 conditionalDepth--;
             }
@@ -170,6 +179,7 @@ namespace Metrics
             if (!Regex.IsMatch(LinewiseCode[position - 1], ElseRegex,
                         RegexOptions.IgnoreCase))
             {
+                //Skip 'begin' preceded by 'else'
                 Console.WriteLine("begin");
                 nestingLevel++;
 
@@ -184,9 +194,11 @@ namespace Metrics
             if (notLastLine && (!Regex.IsMatch(LinewiseCode[i + 1], ElseRegex,
                 RegexOptions.IgnoreCase)))
             {
+                //'End' is not followed by 'else'
                 Console.WriteLine("end");
                 if (nestingLevel == 0)
                 {
+                    //Non-coditional statement block is being processed
                     conditionalDepth--;
 
                 }
@@ -198,6 +210,7 @@ namespace Metrics
             }
             else
             {
+                //Skip 'end' followed by 'else'
                 i += 2;
             }
 
@@ -209,18 +222,21 @@ namespace Metrics
         {
             int i = position;
 
+            //Non-conditional statement encountered
             if (isImplicit)
             {
                 bool notLastLine = i < (LinewiseCode.Length - 2);
                 if (notLastLine && (!Regex.IsMatch(LinewiseCode[i + 1], ElseRegex,
                     RegexOptions.IgnoreCase)))
                 {
+                    //Statement represents the body of the implicit conditional block
                     Console.WriteLine("{0} end implicit", conditionalDepth);
                     conditionalDepth--;
                     i++;
                 }
                 else
                 {
+                    //Skip 'else' keyword
                     i += 2;
                 }
 
