@@ -32,19 +32,20 @@ namespace Metrics
         private static string PredicateRegex =
             "(\\s*(<>|(?<!:)=|<|>)\\s*)(?=[^\\s0-9])|(?<=[^\\s0-9])(\\s*(<>|(?<!:)=|<|>)\\s*)";
 
-        private string WordRegex = "\\b\\w+\\b|;";
-
         private string BlockStartRegex = "\\bbegin\\b";
 
         private string BlockEndRegex = "\\bend\\b";
 
         private AnalyzableSource SourceCode { get; set; }
 
+        private string[] LinewiseCode { get; set; }
+
         private int ConditionalNestingDepth = 0;
 
         public SourceCodeAnalyzer(AnalyzableSource sourceCode)
         {
             SourceCode = sourceCode;
+            LinewiseCode = sourceCode.LinewiseRepresentation;
         }
 
         public int CountAllStatements()
@@ -100,104 +101,134 @@ namespace Metrics
         {
             int conditionalDepth = baseLevel;
             int nestingLevel = 0;
-            string[] linewiseCode = SourceCode.LinewiseRepresentation;
             int i = position;
 
-            while ((i < linewiseCode.Length) && (conditionalDepth >= baseLevel))
+            while ((i < LinewiseCode.Length) && (conditionalDepth >= baseLevel))
             {
                 Console.WriteLine("{0}: {1}", conditionalDepth, i + 1);
                 UpdateConditionalNestingDepth(conditionalDepth);
 
-                if (Regex.IsMatch(linewiseCode[i], ConditionalRegex, RegexOptions.IgnoreCase))
+                if (Regex.IsMatch(LinewiseCode[i], ConditionalRegex, RegexOptions.IgnoreCase))
                 {
-                    Console.WriteLine("cond: {0}", linewiseCode[i]);
-                    bool notLastLine = i < (linewiseCode.Length - 2);
-
-                    if (notLastLine && (!Regex.IsMatch(linewiseCode[i + 1], BlockStartRegex,
-                        RegexOptions.IgnoreCase)) && (!Regex.IsMatch(linewiseCode[i], CaseRegex,
-                        RegexOptions.IgnoreCase)))
-                    {
-                        Console.WriteLine("to implicit");
-                        i = ProcessConditionalNestingLevel(i + 1, baseLevel + 1, true);
-                    }
-                    else
-                    {
-                        i = ProcessConditionalNestingLevel(i + 2, baseLevel + 1, false);
-                    }
-
-                    if (isImplicit)
-                    {
-                        Console.WriteLine("{0}: end implicit", conditionalDepth);
-                        conditionalDepth--;
-                    }
+                    i = ProcessConditionalStatement(i, baseLevel, isImplicit, ref conditionalDepth);
 
                 }
-                else if (Regex.IsMatch(linewiseCode[i], BlockStartRegex,
+                else if (Regex.IsMatch(LinewiseCode[i], BlockStartRegex,
                     RegexOptions.IgnoreCase))
                 {
-                    if (!Regex.IsMatch(linewiseCode[i - 1], ElseRegex,
-                        RegexOptions.IgnoreCase))
-                    {
-                        Console.WriteLine("begin");
-                        nestingLevel++;
-                        
-                    }
+                    ProcessBlockStart(i, ref nestingLevel);
                     i++;
                     
                 }
-                else if (Regex.IsMatch(linewiseCode[i], BlockEndRegex,
+                else if (Regex.IsMatch(LinewiseCode[i], BlockEndRegex,
                 RegexOptions.IgnoreCase))
                 {
-                    bool notLastLine = i < (linewiseCode.Length - 2);
-                    if (notLastLine &&  (!Regex.IsMatch(linewiseCode[i + 1], ElseRegex,
-                        RegexOptions.IgnoreCase)))
-                    {
-                        Console.WriteLine("end");
-                        if (nestingLevel == 0)
-                        {
-                            conditionalDepth--;
-                            
-                        }
-                        else
-                        {
-                            nestingLevel--;
-                        }
-                        i++;
-                    }
-                    else
-                    {
-                        i += 2;
-                    }
+                    i = ProcessBlockEnd(i, ref nestingLevel, ref conditionalDepth);
                 }
                 else
                 {
-                    if (isImplicit)
-                    {
-                        bool notLastLine = i < (linewiseCode.Length - 2);
-                        if (notLastLine && (! Regex.IsMatch(linewiseCode[i + 1], ElseRegex,
-                            RegexOptions.IgnoreCase)))
-                        {
-                            Console.WriteLine("{0} end implicit", conditionalDepth);
-                            conditionalDepth--;
-                            i++;
-                        }
-                        else
-                        {
-                            i += 2;
-                        }
-
-                    }
-                    else
-                    {
-                        i++;
-                    }
+                    i = ProcessDefaultStatement(i, ref conditionalDepth, isImplicit);
                 }
-
                 
             }
 
-            
             Console.WriteLine("{0} end cond, ret {1}", conditionalDepth, i);
+            return i;
+        }
+
+        private int ProcessConditionalStatement(int position, int baseLevel, 
+            bool isImplicit, ref int conditionalDepth)
+        {
+            int i = position;
+            bool notLastLine = i < (LinewiseCode.Length - 2);
+
+            Console.WriteLine("cond: {0}", LinewiseCode[i]);
+
+            if (notLastLine && (!Regex.IsMatch(LinewiseCode[i + 1], BlockStartRegex,
+                RegexOptions.IgnoreCase)) && (!Regex.IsMatch(LinewiseCode[i], CaseRegex,
+                RegexOptions.IgnoreCase)))
+            {
+                Console.WriteLine("to implicit");
+                i = ProcessConditionalNestingLevel(i + 1, baseLevel + 1, true);
+            }
+            else
+            {
+                i = ProcessConditionalNestingLevel(i + 2, baseLevel + 1, false);
+            }
+
+            if (isImplicit)
+            {
+                Console.WriteLine("{0}: end implicit", conditionalDepth);
+                conditionalDepth--;
+            }
+
+            return i;
+        }
+
+        private void ProcessBlockStart(int position, ref int nestingLevel)
+        {
+            if (!Regex.IsMatch(LinewiseCode[position - 1], ElseRegex,
+                        RegexOptions.IgnoreCase))
+            {
+                Console.WriteLine("begin");
+                nestingLevel++;
+
+            }
+        }
+
+        private int ProcessBlockEnd(int position, ref int nestingLevel,
+            ref int conditionalDepth)
+        {
+            int i = position;
+            bool notLastLine = i < (LinewiseCode.Length - 2);
+            if (notLastLine && (!Regex.IsMatch(LinewiseCode[i + 1], ElseRegex,
+                RegexOptions.IgnoreCase)))
+            {
+                Console.WriteLine("end");
+                if (nestingLevel == 0)
+                {
+                    conditionalDepth--;
+
+                }
+                else
+                {
+                    nestingLevel--;
+                }
+                i++;
+            }
+            else
+            {
+                i += 2;
+            }
+
+            return i;
+        }
+
+        private int ProcessDefaultStatement(int position, ref int conditionalDepth,
+            bool isImplicit)
+        {
+            int i = position;
+
+            if (isImplicit)
+            {
+                bool notLastLine = i < (LinewiseCode.Length - 2);
+                if (notLastLine && (!Regex.IsMatch(LinewiseCode[i + 1], ElseRegex,
+                    RegexOptions.IgnoreCase)))
+                {
+                    Console.WriteLine("{0} end implicit", conditionalDepth);
+                    conditionalDepth--;
+                    i++;
+                }
+                else
+                {
+                    i += 2;
+                }
+
+            }
+            else
+            {
+                i++;
+            }
 
             return i;
         }
