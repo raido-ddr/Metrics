@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -20,16 +21,24 @@ namespace Metrics
         private string LoopRegex = "\\bfor\\b.*?\\bdo\\b|\\bwhile\\b.*?\\bdo\\b|\\buntil\\b.*?;";
         private string ConditionalRegex = "\\bcase\\b.*?\\bof\\b|\\bif\\b.*?\\bthen\\b";
 
-        private string ConditionalStatementRegex = "\\bif\\b|\\belse\\b";
+        private string ElseRegex = "\\belse\\b";
+
+        private string ConditionalStatementRegex = "\\bif\\b";
 
         private string PredicateOperatorRegex = "\\bif\\b";
 
         private static string PredicateRegex =
-          "(\\s*(<>|(?<!:)=|<|>)\\s*)(?=[^\\s0-9])|(?<=[^\\s0-9])(\\s*(<>|(?<!:)=|<|>)\\s*)";
+            "(\\s*(<>|(?<!:)=|<|>)\\s*)(?=[^\\s0-9])|(?<=[^\\s0-9])(\\s*(<>|(?<!:)=|<|>)\\s*)";
 
         private string WordRegex = "\\b\\w+\\b|;";
 
+        private string BlockStartRegex = "\\bbegin\\b";
+
+        private string BlockEndRegex = "\\bend\\b";
+
         private AnalyzableSource SourceCode { get; set; }
+
+        private int ConditionalNestingDepth = 0;
 
         public SourceCodeAnalyzer(AnalyzableSource sourceCode)
         {
@@ -43,13 +52,14 @@ namespace Metrics
 
         public int CountConditionalStatements()
         {
-            return CountRegexMatches(ConditionalStatementRegex);
+            int m = CountRegexMatches(ConditionalStatementRegex);
+            return m;
         }
-        
+
 
         public int EvaluateCyclomaticComplexity()
         {
-            CyclomaticComplexityEvaluator evaluator = 
+            CyclomaticComplexityEvaluator evaluator =
                 CyclomaticComplexityEvaluator.Instance;
 
             return evaluator.EvaluateCyclomaticComplexity(SourceCode);
@@ -69,7 +79,7 @@ namespace Metrics
         {
 
             MatchCollection matches =
-                    Regex.Matches(SourceCode.NormalizedRepresentation, regex,
+                Regex.Matches(SourceCode.NormalizedRepresentation, regex,
                     RegexOptions.IgnoreCase);
 
             return matches.Count;
@@ -77,32 +87,102 @@ namespace Metrics
 
         public int CountConditionalNestingLevel()
         {
-            int nestingLevel = 0;
-            string sourceString = SourceCode.NormalizedRepresentation;
+            ConditionalNestingDepth = 0;
+            ProcessConditionalNestingLevel(0, 0, false);
 
-            MatchCollection matches =
-                Regex.Matches(sourceString, WordRegex, RegexOptions.IgnoreCase);
-
-            int i = 0;
-            int maxNestingLevel = 0;
-            int levelIndicator = 0;
-
-            //nestingLevel = CountCurrentBlockLevel(matches, 0);
-
-            return nestingLevel;
+            return ConditionalNestingDepth;
         }
 
-        private int CountCurrentBlockLevel(MatchCollection matches, ref int i, int baseBlockLevel)
+
+        private int ProcessConditionalNestingLevel(int position, int baseLevel, bool isImplicit)
         {
-            int blockLevel = baseBlockLevel + 1;
-            int levelIndicator = 0;
+            int nestingLevel = baseLevel;
+            string[] linewiseCode = SourceCode.LinewiseRepresentation;
+            int i = position;
 
-            while (blockLevel > baseBlockLevel)
+            while ((i < linewiseCode.Length) && (nestingLevel >= baseLevel))
             {
+                Console.WriteLine("{0}: {1}", nestingLevel, i + 1);
 
+                if (Regex.IsMatch(linewiseCode[i], ConditionalRegex, RegexOptions.IgnoreCase))
+                {
+                    Console.WriteLine("cond: {0}", linewiseCode[i]);
+                    bool notLastLine = i < (linewiseCode.Length - 2);
+
+                    if (notLastLine && (!Regex.IsMatch(linewiseCode[i + 1], BlockStartRegex,
+                        RegexOptions.IgnoreCase)))
+                    {
+                        Console.WriteLine("to implicit");
+                        i = ProcessConditionalNestingLevel(i + 1, baseLevel + 1, true);
+                        //nestingLevel++;
+                    }
+                    else
+                    {
+                        i = ProcessConditionalNestingLevel(i + 1, baseLevel + 1, false);
+                    }
+
+                    if (isImplicit)
+                    {
+                        Console.WriteLine("{0}: end implicit", nestingLevel);
+                        nestingLevel--;
+                        //i++;
+                    }
+
+                }
+                else if (Regex.IsMatch(linewiseCode[i], BlockEndRegex,
+                    RegexOptions.IgnoreCase))
+                {
+                    if (!Regex.IsMatch(linewiseCode[i + 1], ElseRegex,
+                        RegexOptions.IgnoreCase))
+                    {
+                        Console.WriteLine("end");
+                        nestingLevel--;
+                        i++;
+                    }
+                    else
+                    {
+                        i += 2;
+                    }
+                }
+                else
+                {
+                    if (isImplicit)
+                    {
+                        bool notLastLine = i < (linewiseCode.Length - 2);
+                        if (notLastLine && (! Regex.IsMatch(linewiseCode[i + 1], ElseRegex,
+                            RegexOptions.IgnoreCase)))
+                        {
+                            Console.WriteLine("{0} end implicit", nestingLevel);
+                            nestingLevel--;
+                            i++;
+                        }
+                        else
+                        {
+                            i += 2;
+                        }
+
+                    }
+                    else
+                    {
+                        i++;
+                    }
+                }
+
+                UpdateConditionalNestingDepth(nestingLevel);
             }
-            return levelIndicator;
 
+            Console.WriteLine("{0} end cond, ret {1}", nestingLevel, i);
+
+            return i;
         }
+
+        private void UpdateConditionalNestingDepth(int nestingLevel)
+        {
+            if (nestingLevel > ConditionalNestingDepth)
+            {
+                ConditionalNestingDepth = nestingLevel;
+            }
+        }
+
     }
 }

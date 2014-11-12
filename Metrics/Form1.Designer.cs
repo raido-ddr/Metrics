@@ -49,6 +49,8 @@
             this.SourceFileTxt = new System.Windows.Forms.TextBox();
             this.SourceFileDlg = new System.Windows.Forms.OpenFileDialog();
             this.SourceCodeViewTxt = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.ConditionalNestingTxt = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -58,6 +60,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.ConditionalNestingTxt);
+            this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.EvaluateJilbBtn);
             this.groupBox1.Controls.Add(this.JilbMetricTxt);
             this.groupBox1.Controls.Add(this.label2);
@@ -67,7 +71,7 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(236, 159);
+            this.groupBox1.Size = new System.Drawing.Size(236, 191);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Jilb metric";
@@ -75,7 +79,7 @@
             // EvaluateJilbBtn
             // 
             this.EvaluateJilbBtn.Enabled = false;
-            this.EvaluateJilbBtn.Location = new System.Drawing.Point(10, 121);
+            this.EvaluateJilbBtn.Location = new System.Drawing.Point(10, 153);
             this.EvaluateJilbBtn.Name = "EvaluateJilbBtn";
             this.EvaluateJilbBtn.Size = new System.Drawing.Size(75, 23);
             this.EvaluateJilbBtn.TabIndex = 6;
@@ -85,7 +89,7 @@
             // 
             // JilbMetricTxt
             // 
-            this.JilbMetricTxt.Location = new System.Drawing.Point(165, 91);
+            this.JilbMetricTxt.Location = new System.Drawing.Point(165, 118);
             this.JilbMetricTxt.Name = "JilbMetricTxt";
             this.JilbMetricTxt.ReadOnly = true;
             this.JilbMetricTxt.Size = new System.Drawing.Size(56, 20);
@@ -94,7 +98,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 94);
+            this.label2.Location = new System.Drawing.Point(7, 121);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(91, 13);
             this.label2.TabIndex = 4;
@@ -141,7 +145,7 @@
             this.groupBox2.Controls.Add(this.CyclomaticComplexityTxt);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Location = new System.Drawing.Point(12, 192);
+            this.groupBox2.Location = new System.Drawing.Point(12, 223);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(236, 123);
             this.groupBox2.TabIndex = 1;
@@ -249,6 +253,23 @@
             this.SourceCodeViewTxt.Size = new System.Drawing.Size(438, 395);
             this.SourceCodeViewTxt.TabIndex = 4;
             // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(8, 90);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(129, 13);
+            this.label5.TabIndex = 7;
+            this.label5.Text = "Conditional nesting depth:";
+            // 
+            // ConditionalNestingTxt
+            // 
+            this.ConditionalNestingTxt.Location = new System.Drawing.Point(165, 87);
+            this.ConditionalNestingTxt.Name = "ConditionalNestingTxt";
+            this.ConditionalNestingTxt.ReadOnly = true;
+            this.ConditionalNestingTxt.Size = new System.Drawing.Size(56, 20);
+            this.ConditionalNestingTxt.TabIndex = 8;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -296,6 +317,8 @@
         private System.Windows.Forms.TextBox SourceFileTxt;
         private System.Windows.Forms.OpenFileDialog SourceFileDlg;
         private System.Windows.Forms.TextBox SourceCodeViewTxt;
+        private System.Windows.Forms.TextBox ConditionalNestingTxt;
+        private System.Windows.Forms.Label label5;
     }
 }
 

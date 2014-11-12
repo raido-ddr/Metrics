@@ -25,8 +25,10 @@ namespace Metrics
             MetricEvaluationContext context = 
                 new MetricEvaluationContext(new JilbEvaluationStrategy());
             JilbMetric jilbMetric = context.EvaluateMetric(sourceCode) as JilbMetric;
+
             StatementCountTxt.Text = jilbMetric.TotalStatementCount.ToString();
             ConditionalStatementCountTxt.Text = jilbMetric.ConditionalStatementCount.ToString();
+            ConditionalNestingTxt.Text = jilbMetric.ConditionNestingLevel.ToString();
             JilbMetricTxt.Text = jilbMetric.Value.ToString("F3");
 
         }
